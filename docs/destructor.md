@@ -7,8 +7,8 @@ Destructor creates a function for the given type, that returns all the fields.
 ```go
 //gombok:Destructor
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

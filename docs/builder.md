@@ -8,8 +8,8 @@ The builder can be used to create multiple instaces that are built similarly.
 ```go
 //gombok:Builder
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

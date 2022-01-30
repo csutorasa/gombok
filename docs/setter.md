@@ -7,8 +7,8 @@ Setter creates setter function for a given field.
 ```go
 //gombok:Setter
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

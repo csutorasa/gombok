@@ -7,8 +7,8 @@ Stringer implements the `fmt.Stringer` interface.
 ```go
 //gombok:Stringer
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

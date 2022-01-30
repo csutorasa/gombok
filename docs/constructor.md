@@ -7,8 +7,8 @@ Constructor creates a constructor function for the given type.
 ```go
 //gombok:Constructor
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

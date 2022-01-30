@@ -7,8 +7,8 @@ Getter creates getter function for a given field.
 ```go
 //gombok:Getter
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {

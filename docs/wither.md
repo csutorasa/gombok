@@ -7,8 +7,8 @@ Wither creates a function that returns a new instance with a modified field.
 ```go
 //gombok:Wither
 type Name struct {
-	firstname string
-	lastname string
+    firstname string
+    lastname string
 }
 
 func main() {
