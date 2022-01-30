@@ -26,8 +26,8 @@ You can add the gombok comments or tags to enable code generation.
 //gombok:Stringer
 type Example struct {
     //gombok:Getter
-	firstname string
-	lastname string `gombokSetter:""`
+    firstname string
+    lastname string `gombokSetter:""`
 }
 ```
 
