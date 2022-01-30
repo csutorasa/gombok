@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-//go:embed templates/builder.tpl
+//go:embed templates/builder.go.tmpl
 var builderTemplateString string
 var builderTemplate *template.Template
 

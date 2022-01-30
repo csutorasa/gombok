@@ -7,11 +7,11 @@ import (
 	"text/template"
 )
 
-//go:embed templates/setter.tpl
+//go:embed templates/setter.go.tmpl
 var setterTemplateString string
 var setterTemplate *template.Template
 
-//go:embed templates/chainsetter.tpl
+//go:embed templates/chainsetter.go.tmpl
 var chainSetterTemplateString string
 var chainSetterTemplate *template.Template
 

@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-//go:embed templates/wither.tpl
+//go:embed templates/wither.go.tmpl
 var witherTemplateString string
 var witherTemplate *template.Template
 

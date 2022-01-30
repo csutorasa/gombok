@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-//go:embed templates/destructor.tpl
+//go:embed templates/destructor.go.tmpl
 var destructorTemplateString string
 var destructorTemplate *template.Template
 

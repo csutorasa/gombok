@@ -6,15 +6,15 @@ import (
 	"text/template"
 )
 
-//go:embed templates/header.tpl
+//go:embed templates/header.go.tmpl
 var headerTemplateString string
 var headerTemplate *template.Template
 
-//go:embed templates/import.tpl
+//go:embed templates/import.go.tmpl
 var importTemplateString string
 var importTemplate *template.Template
 
-//go:embed templates/imports.tpl
+//go:embed templates/imports.go.tmpl
 var importsTemplateString string
 var importsTemplate *template.Template
 

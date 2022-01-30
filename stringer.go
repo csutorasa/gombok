@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-//go:embed templates/stringer.tpl
+//go:embed templates/stringer.go.tmpl
 var stringerTemplateString string
 var stringerTemplate *template.Template
 
