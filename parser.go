@@ -252,7 +252,7 @@ func readTags(field *ast.Field, packageName, structName, fieldName string) []str
 			prop := key[len("gombok"):]
 			tags = append(tags, fmt.Sprintf("%s %s", prop, value))
 		}
-		tagValue = tagValue[endIndex+1:]
+		tagValue = strings.Trim(tagValue[endIndex+1:], " \t")
 	}
 }
 

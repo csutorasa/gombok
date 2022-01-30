@@ -7,7 +7,7 @@ Gombok is a go code generation library inspired by [Project Lombok](https://proj
 Install the generator with the following command:
 
 ```bash
-go install github.com/csutorasa/gombok
+go install github.com/csutorasa/gombok@latest
 ```
 
 ## How to use
