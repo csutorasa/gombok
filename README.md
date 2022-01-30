@@ -20,6 +20,15 @@ Enable default generation:
 //go:generate gombok
 ```
 
+This enables processing all files in the project. To disable processing for specific files you can add:
+
+```go
+//gombok:ignore
+```
+
+All generated files have this ignore flag.
+
+
 You can add the gombok comments or tags to enable code generation.
 
 ```go
