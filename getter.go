@@ -7,8 +7,11 @@ import (
 	"text/template"
 )
 
-//go:embed templates/getter.go.tmpl
-var getterTemplateString string
+var getterTemplateString string = `
+func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .g }}et{{ capitalize .fieldName }}() {{ .fieldType }} {
+	return this.{{ .fieldName }}
+}
+`
 var getterTemplate *template.Template
 
 func init() {

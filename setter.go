@@ -7,12 +7,19 @@ import (
 	"text/template"
 )
 
-//go:embed templates/setter.go.tmpl
-var setterTemplateString string
+var setterTemplateString string = `
+func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) {
+	this.{{ .fieldName }} = {{ .fieldName }}
+}
+`
 var setterTemplate *template.Template
 
-//go:embed templates/chainsetter.go.tmpl
-var chainSetterTemplateString string
+var chainSetterTemplateString string = `
+func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
+	this.{{ .fieldName }} = {{ .fieldName }}
+	return this
+}
+`
 var chainSetterTemplate *template.Template
 
 func init() {

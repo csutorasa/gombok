@@ -7,8 +7,11 @@ import (
 	"text/template"
 )
 
-//go:embed templates/destructor.go.tmpl
-var destructorTemplateString string
+var destructorTemplateString string = `{{ $fields := .fields }}
+func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .d }}estruct() ({{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}{{ index $fields $e }}{{ end }}) {
+	return {{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}this.{{ $e }}{{ end }}
+}
+`
 var destructorTemplate *template.Template
 
 func init() {
