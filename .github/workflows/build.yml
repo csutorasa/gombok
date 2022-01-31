@@ -21,11 +21,9 @@ jobs:
         run: |
           go install golang.org/dl/go1.18beta1@latest
           go1.18beta1 download
-          cp $(which go1.18beta1) $(which go)
-          go version
         
       - name: Build
-        run: go build
+        run: go1.18beta1 build
         env:
           GOOS: windows
           GOARCH: amd64
@@ -78,7 +76,6 @@ jobs:
           go install golang.org/dl/go1.18beta1@latest
           go1.18beta1 download
           cp $(which go1.18beta1) $(which go)
-          go version
 
       - name: Build
         run: go build
