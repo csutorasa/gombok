@@ -7,7 +7,6 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
-	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -25,7 +24,7 @@ var typeProcessors = []typeProcessor{
 	processStringer,
 }
 
-func fileFilter(dir string, fi fs.FileInfo) bool {
+func fileFilter(dir string, fi os.FileInfo) bool {
 	file, err := os.Open(filepath.Join(dir, fi.Name()))
 	if err != nil {
 		errorLogger.Printf("Failed to open file %s", fi.Name())
@@ -71,7 +70,7 @@ func processDirRecursive(dir string) error {
 func processDir(dir string) error {
 	debugLogger.Printf("Start parsing directory %s", dir)
 	fset := token.NewFileSet()
-	packages, err := parser.ParseDir(fset, dir, func(fi fs.FileInfo) bool {
+	packages, err := parser.ParseDir(fset, dir, func(fi os.FileInfo) bool {
 		return fileFilter(dir, fi)
 	}, parser.ParseComments)
 	if err != nil {
