@@ -52,7 +52,11 @@ func processDirRecursive(dir string) error {
 	if err != nil {
 		return err
 	}
-	entries, err := os.ReadDir(dir)
+	f, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	entries, err := f.ReadDir(-1)
 	if err != nil {
 		return err
 	}
