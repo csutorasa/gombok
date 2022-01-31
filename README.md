@@ -5,7 +5,9 @@ Gombok is a go code generation library inspired by [Project Lombok](https://proj
 ## How to install
 
 Install go version 1.16 or newer.
-You can use generics if you switch to the 1.18 or newer version [here](https://github.com/csutorasa/gombok).
+
+You can upgrade to 1.18 or newer and use generics [here](https://github.com/csutorasa/gombok).
+You can downgrade to 1.13 for older project [here](https://github.com/csutorasa/gombok/tree/1.13).
 
 Install the generator with the following command:
 
