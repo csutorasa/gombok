@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,21 +24,21 @@ func main() {
 		os.Exit(2)
 	}
 	if *quiet {
-		errorLogger = log.New(io.Discard, "[ERROR] ", log.LstdFlags)
-		infoLogger = log.New(io.Discard, "[INFO] ", log.LstdFlags)
-		debugLogger = log.New(io.Discard, "[DEBUG] ", log.LstdFlags)
+		errorLogger = log.New(discard{}, "[ERROR] ", log.LstdFlags)
+		infoLogger = log.New(discard{}, "[INFO] ", log.LstdFlags)
+		debugLogger = log.New(discard{}, "[DEBUG] ", log.LstdFlags)
 	} else if *info {
 		errorLogger = log.New(os.Stderr, "[ERROR] ", log.LstdFlags)
 		infoLogger = log.New(os.Stderr, "[INFO] ", log.LstdFlags)
-		debugLogger = log.New(io.Discard, "[DEBUG] ", log.LstdFlags)
+		debugLogger = log.New(discard{}, "[DEBUG] ", log.LstdFlags)
 	} else if *debug {
 		errorLogger = log.New(os.Stderr, "[ERROR] ", log.LstdFlags)
 		infoLogger = log.New(os.Stderr, "[INFO] ", log.LstdFlags)
 		debugLogger = log.New(os.Stderr, "[DEBUG] ", log.LstdFlags)
 	} else {
 		errorLogger = log.New(os.Stderr, "[ERROR] ", log.LstdFlags)
-		infoLogger = log.New(io.Discard, "[INFO] ", log.LstdFlags)
-		debugLogger = log.New(io.Discard, "[DEBUG] ", log.LstdFlags)
+		infoLogger = log.New(discard{}, "[INFO] ", log.LstdFlags)
+		debugLogger = log.New(discard{}, "[DEBUG] ", log.LstdFlags)
 	}
 	filenameFormatter = *filename
 
@@ -53,4 +52,14 @@ func main() {
 		errorLogger.Println(err)
 		os.Exit(1)
 	}
+}
+
+type discard struct{}
+
+func (discard) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+func (discard) WriteString(s string) (int, error) {
+	return len(s), nil
 }
