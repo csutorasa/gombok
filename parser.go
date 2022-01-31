@@ -141,17 +141,6 @@ func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *a
 			}
 			genericTypes := map[string]string{}
 			genericTypeNames := []string{}
-			if t.TypeParams != nil {
-				for _, typeParam := range t.TypeParams.List {
-					fieldName := typeParam.Names[0].String()
-					genericType, importNames := readRootExpression(typeParam.Type, imports)
-					for imp := range importNames {
-						imports[imp] = true
-					}
-					genericTypes[fieldName] = genericType
-					genericTypeNames = append(genericTypeNames, fieldName)
-				}
-			}
 			structName := t.Name.Name
 			fields := map[string]string{}
 			fieldComments := map[string][]string{}
@@ -358,21 +347,7 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 				results = append(results, v)
 			}
 		}
-		genericFieldNames := []string{}
-		if e.TypeParams != nil {
-			for _, field := range e.TypeParams.List {
-				fieldName := field.Names[0].String()
-				typeName, importNames := readRootExpression(field.Type, imports)
-				for imp := range importNames {
-					imports[imp] = true
-				}
-				genericFieldNames = append(genericFieldNames, fmt.Sprintf("%s %s", fieldName, typeName))
-			}
-		}
 		genericText := ""
-		if len(genericFieldNames) != 0 {
-			genericText = fmt.Sprintf("[%s]", strings.Join(genericFieldNames, ", "))
-		}
 		if len(results) == 0 {
 			switch parent.(type) {
 			case *ast.InterfaceType:
