@@ -56,7 +56,7 @@ func processDirRecursive(dir string) error {
 	if err != nil {
 		return err
 	}
-	entries, err := f.ReadDir(-1)
+	entries, err := f.Readdir(-1)
 	if err != nil {
 		return err
 	}
