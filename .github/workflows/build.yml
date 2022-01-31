@@ -64,9 +64,3 @@ jobs:
         env:
           GOOS: darwin
           GOARCH: amd64
-        
-      - name: Build
-        run: go build
-        env:
-          GOOS: darwin
-          GOARCH: arm64
