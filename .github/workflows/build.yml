@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -19,16 +19,13 @@ jobs:
         
       - name: Build
         run: go build
-        env:
-          GOOS: windows
-          GOARCH: amd64
 
   build_linux:
     name: Build linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -36,23 +33,14 @@ jobs:
           go-version: '1.13'
 
       - name: Build
-        run: go build
-        env:
-          GOOS: linux
-          GOARCH: amd64
-        
-      - name: Build
-        run: go build
-        env:
-          GOOS: linux
-          GOARCH: arm64
+        run: go test
         
   build_darwin:
     name: Build Mac
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -60,7 +48,4 @@ jobs:
           go-version: '1.13'
 
       - name: Build
-        run: go build
-        env:
-          GOOS: darwin
-          GOARCH: amd64
+        run: go test

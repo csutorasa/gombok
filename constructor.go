@@ -7,8 +7,8 @@ import (
 )
 
 var constructorTemplateString string = `{{ $fields := .fields }}
-func New{{ .structName }}{{ genericListWithTypes .genericTypeNames .genericTypes }}({{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}{{ $e }} {{ index $fields $e }}{{ end }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
-	return &{{ .structName }}{{ genericList .genericTypeNames }}{
+func New{{ capitalize .structName }}({{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}{{ $e }} {{ index $fields $e }}{{ end }}) *{{ .structName }} {
+	return &{{ .structName }}{
 {{ range .fieldNames }}		{{ . }}: {{ . }},
 {{ end }}	}
 }
@@ -27,7 +27,7 @@ func processConstructor(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Constructor")
 			if found {
 				fieldConfig, err := parseConstructorFieldConfig(commands, data.structName, fieldName)
@@ -44,11 +44,9 @@ func processConstructor(data *typeProcessorData) error {
 		debugLogger.Printf("Generating Constructor for %s", data.structName)
 		data.addCodeWriter(func(wr io.Writer) error {
 			return constructorTemplate.Execute(wr, map[string]interface{}{
-				"structName":       data.structName,
-				"fieldNames":       fieldNames,
-				"fields":           data.fields,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
+				"structName": data.structName,
+				"fieldNames": fieldNames,
+				"fields":     data.fields,
 			})
 		})
 	}

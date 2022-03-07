@@ -7,7 +7,7 @@ import (
 )
 
 var getterTemplateString string = `
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .g }}et{{ capitalize .fieldName }}() {{ .fieldType }} {
+func (this *{{ .structName }}) {{ .g }}et{{ capitalize .fieldName }}() {{ .fieldType }} {
 	return this.{{ .fieldName }}
 }
 `
@@ -24,7 +24,8 @@ func processGetter(data *typeProcessorData) error {
 		if err != nil {
 			return err
 		}
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			debugLogger.Printf("Generating Getter for %s.%s", data.structName, fieldName)
 			fieldCommands, found := hasComment(data.fieldComments[fieldName], "Getter")
 			if found {
@@ -38,7 +39,8 @@ func processGetter(data *typeProcessorData) error {
 			}
 		}
 	} else {
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			commands, found := hasComment(data.fieldComments[fieldName], "Getter")
 			if found {
 				config, err := parseGetterConfig(commands, fmt.Sprintf("%s.%s", data.structName, fieldName))
@@ -90,12 +92,10 @@ func addGetter(fieldName string, fieldType string, data *typeProcessorData, conf
 	}
 	data.addCodeWriter(func(wr io.Writer) error {
 		return getterTemplate.Execute(wr, map[string]interface{}{
-			"structName":       data.structName,
-			"fieldName":        fieldName,
-			"fieldType":        fieldType,
-			"genericTypes":     data.genericTypes,
-			"genericTypeNames": data.genericTypeNames,
-			"g":                g,
+			"structName": data.structName,
+			"fieldName":  fieldName,
+			"fieldType":  fieldType,
+			"g":          g,
 		})
 	})
 }

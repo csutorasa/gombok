@@ -7,7 +7,7 @@ import (
 )
 
 var stringerTemplateString string = `
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) String() string {
+func (this *{{ .structName }}) String() string {
 	return fmt.Sprintf("{{ .packageName }}.{{ .structName }}{{"{"}}{{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}{{ $e }}=%v{{ end }}{{"}"}}", {{ range $i, $e := .fieldNames  }}{{ if $i }}{{", "}}{{ end }}this.{{ $e }}{{ end }})
 }
 `
@@ -25,7 +25,7 @@ func processStringer(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Stringer")
 			if found {
 				fieldConfig, err := parseStringerFieldConfig(commands, data.structName, fieldName)
@@ -46,8 +46,6 @@ func processStringer(data *typeProcessorData) error {
 				"packageName":      data.packageName,
 				"structName":       data.structName,
 				"fieldNames":       fieldNames,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
 			})
 		})
 	}

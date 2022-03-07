@@ -7,14 +7,14 @@ import (
 )
 
 var setterTemplateString string = `
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) {
+func (this *{{ .structName }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) {
 	this.{{ .fieldName }} = {{ .fieldName }}
 }
 `
 var setterTemplate *template.Template
 
 var chainSetterTemplateString string = `
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
+func (this *{{ .structName }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }} {
 	this.{{ .fieldName }} = {{ .fieldName }}
 	return this
 }
@@ -33,7 +33,8 @@ func processSetter(data *typeProcessorData) error {
 		if err != nil {
 			return err
 		}
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			debugLogger.Printf("Generating Setter for %s.%s", data.structName, fieldName)
 			fieldCommands, found := hasComment(data.fieldComments[fieldName], "Setter")
 			if found {
@@ -47,7 +48,8 @@ func processSetter(data *typeProcessorData) error {
 			}
 		}
 	} else {
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			commands, found := hasComment(data.fieldComments[fieldName], "Setter")
 			if found {
 				config, err := parseSetterConfig(commands, fmt.Sprintf("%s.%s", data.structName, fieldName))
@@ -115,12 +117,10 @@ func addSetter(fieldName, fieldType string, data *typeProcessorData, config *set
 			t = setterTemplate
 		}
 		return t.Execute(wr, map[string]interface{}{
-			"structName":       data.structName,
-			"fieldName":        fieldName,
-			"fieldType":        fieldType,
-			"genericTypes":     data.genericTypes,
-			"genericTypeNames": data.genericTypeNames,
-			"s":                s,
+			"structName": data.structName,
+			"fieldName":  fieldName,
+			"fieldType":  fieldType,
+			"s":          s,
 		})
 	})
 }

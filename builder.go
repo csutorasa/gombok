@@ -6,23 +6,23 @@ import (
 	"text/template"
 )
 
-var builderTemplateString string = `{{ $fields := .fields }}{{ $structName := .structName }}{{ $genericTypeNames := .genericTypeNames }}
-type {{ lower .structName }}Builder{{ genericListWithTypes .genericTypeNames .genericTypes }} struct {
-	data {{ .structName }}{{ genericList .genericTypeNames }}
+var builderTemplateString string = `{{ $fields := .fields }}{{ $structName := .structName }}
+type {{ lower .structName }}Builder struct {
+	data {{ .structName }}
 }
 {{ range .fieldNames }}
-func (this *{{ lower $structName }}Builder{{ genericList $genericTypeNames }}) {{ capitalize . }}({{ . }} {{ index $fields . }}) *{{ lower $structName }}Builder{{ genericList $genericTypeNames }} {
+func (this *{{ lower $structName }}Builder) {{ capitalize . }}({{ . }} {{ index $fields . }}) *{{ lower $structName }}Builder {
 	this.data.{{ . }} = {{ . }}
 	return this
 }
 {{end}}
-func (this *{{ lower $structName }}Builder{{ genericList .genericTypeNames }}) Build() {{ .structName }}{{ genericList .genericTypeNames }} {
+func (this *{{ lower $structName }}Builder) Build() {{ .structName }} {
 	return this.data
 }
 
-func New{{ capitalize .structName }}Builder{{ genericListWithTypes .genericTypeNames .genericTypes }}() *{{ lower .structName }}Builder{{ genericList .genericTypeNames }} {
-	return &{{ lower .structName }}Builder{{ genericList .genericTypeNames }}{
-		data: {{ .structName }}{{ genericList .genericTypeNames }}{},
+func New{{ capitalize .structName }}Builder() *{{ lower .structName }}Builder {
+	return &{{ lower .structName }}Builder{
+		data: {{ .structName }}{},
 	}
 }
 `
@@ -40,7 +40,7 @@ func processBuilder(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Builder")
 			if found {
 				fieldConfig, err := parseBuilderFieldConfig(commands, data.structName, fieldName)
@@ -57,11 +57,9 @@ func processBuilder(data *typeProcessorData) error {
 		debugLogger.Printf("Generating Builder for %s", data.structName)
 		data.addCodeWriter(func(wr io.Writer) error {
 			return builderTemplate.Execute(wr, map[string]interface{}{
-				"structName":       data.structName,
-				"fieldNames":       fieldNames,
-				"fields":           data.fields,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
+				"structName": data.structName,
+				"fieldNames": fieldNames,
+				"fields":     data.fields,
 			})
 		})
 	}

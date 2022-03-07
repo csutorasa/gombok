@@ -7,8 +7,8 @@ import (
 )
 
 var witherTemplateString string = `{{ $fields := .fields }}{{ $fieldName := .fieldName }}
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .w }}ith{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
-	return &{{ .structName }}{{ genericList .genericTypeNames }}{
+func (this *{{ .structName }}) {{ .w }}ith{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }} {
+	return &{{ .structName }}{
 {{ range .fieldNames }}		{{ . }}: {{ if eq . $fieldName }}{{ . }}{{ else }}this.{{ . }}{{ end }},
 {{ end }}	}
 }
@@ -26,7 +26,8 @@ func processWither(data *typeProcessorData) error {
 		if err != nil {
 			return err
 		}
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			debugLogger.Printf("Generating Wither for %s.%s", data.structName, fieldName)
 			fieldCommands, found := hasComment(data.fieldComments[fieldName], "Wither")
 			if found {
@@ -40,7 +41,8 @@ func processWither(data *typeProcessorData) error {
 			}
 		}
 	} else {
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			commands, found := hasComment(data.fieldComments[fieldName], "Wither")
 			if found {
 				config, err := parseWitherConfig(commands, fmt.Sprintf("%s.%s", data.structName, fieldName))
@@ -97,8 +99,6 @@ func addWither(fieldName, fieldType string, data *typeProcessorData, config *wit
 			"fieldType":        fieldType,
 			"fieldNames":       data.fieldNames,
 			"fields":           data.fields,
-			"genericTypes":     data.genericTypes,
-			"genericTypeNames": data.genericTypeNames,
 			"w":                w,
 		})
 	})
