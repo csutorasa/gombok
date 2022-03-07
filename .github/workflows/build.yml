@@ -23,7 +23,7 @@ jobs:
           go1.18beta2 download
         
       - name: Build
-        run: go1.18beta2 build
+        run: go1.18beta2 test
         env:
           GOOS: windows
           GOARCH: amd64
@@ -48,13 +48,13 @@ jobs:
           go version
 
       - name: Build
-        run: go build
+        run: go test
         env:
           GOOS: linux
           GOARCH: amd64
         
       - name: Build
-        run: go build
+        run: go test
         env:
           GOOS: linux
           GOARCH: arm64
@@ -78,13 +78,13 @@ jobs:
           cp $(which go1.18beta2) $(which go)
 
       - name: Build
-        run: go build
+        run: go test
         env:
           GOOS: darwin
           GOARCH: amd64
         
       - name: Build
-        run: go build
+        run: go test
         env:
           GOOS: darwin
           GOARCH: arm64
