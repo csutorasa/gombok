@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 )
 
-var errorLogger *log.Logger
-var infoLogger *log.Logger
-var debugLogger *log.Logger
-var filenameFormatter string
+var errorLogger *log.Logger = log.New(os.Stderr, "[ERROR] ", log.LstdFlags)
+var infoLogger *log.Logger = log.New(os.Stderr, "[INFO] ", log.LstdFlags)
+var debugLogger *log.Logger = log.New(io.Discard, "[DEBUG] ", log.LstdFlags)
+var filenameFormatter string = "%s_gombok.go"
 
 func main() {
 	quiet := flag.Bool("quiet", false, "Sets logger to none")

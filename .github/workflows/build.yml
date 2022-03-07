@@ -19,11 +19,11 @@ jobs:
           
       - name: Install beta version
         run: |
-          go install golang.org/dl/go1.18beta1@latest
-          go1.18beta1 download
+          go install golang.org/dl/go1.18beta2@latest
+          go1.18beta2 download
         
       - name: Build
-        run: go1.18beta1 build
+        run: go1.18beta2 build
         env:
           GOOS: windows
           GOARCH: amd64
@@ -42,9 +42,9 @@ jobs:
           
       - name: Install beta version
         run: |
-          go install golang.org/dl/go1.18beta1@latest
-          go1.18beta1 download
-          cp $(which go1.18beta1) $(which go)
+          go install golang.org/dl/go1.18beta2@latest
+          go1.18beta2 download
+          cp $(which go1.18beta2) $(which go)
           go version
 
       - name: Build
@@ -73,9 +73,9 @@ jobs:
           
       - name: Install beta version
         run: |
-          go install golang.org/dl/go1.18beta1@latest
-          go1.18beta1 download
-          cp $(which go1.18beta1) $(which go)
+          go install golang.org/dl/go1.18beta2@latest
+          go1.18beta2 download
+          cp $(which go1.18beta2) $(which go)
 
       - name: Build
         run: go build
