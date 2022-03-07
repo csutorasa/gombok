@@ -306,6 +306,13 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 		k, _ := readChildExpression(e.Key, e, imports)
 		v, _ := readChildExpression(e.Value, e, imports)
 		return fmt.Sprintf("%smap[%s]%s", name, k, v), imports
+	case *ast.UnaryExpr:
+		x, _ := readChildExpression(e.X, e, imports)
+		return fmt.Sprintf("%s%s%s", name, e.Op.String(), x), imports
+	case *ast.BinaryExpr:
+		x, _ := readChildExpression(e.X, e, imports)
+		y, _ := readChildExpression(e.Y, e, imports)
+		return fmt.Sprintf("%s%s %s %s", name, x, e.Op.String(), y), imports
 	case *ast.ChanType:
 		var ch string
 		if e.Dir == ast.SEND {
