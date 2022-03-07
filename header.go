@@ -37,8 +37,18 @@ func writeHeader(wr io.Writer, packageName string) error {
 func writeImport(wr io.Writer, imports map[string]bool, fileImports map[string]*impData) error {
 	if len(imports) == 1 {
 		for imp := range imports {
+			fileImp := fileImports[imp]
+			if imp == "fmt" && fileImp == nil {
+				fileImp = &impData{
+					HasName: false,
+					Name:    "fmt",
+					Path:    "fmt",
+				}
+			}
 			return importTemplate.Execute(wr, map[string]interface{}{
-				"import": imp,
+				"HasName": fileImp.HasName,
+				"Name":    fileImp.Name,
+				"Path":    fileImp.Path,
 			})
 		}
 	} else if len(imports) > 1 {
