@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"text/template"
 )
 
 var templateFunctions template.FuncMap = template.FuncMap{
-	"capitalize":           capitalize,
-	"lower":                lower,
+	"capitalize": capitalize,
+	"lower":      lower,
 }
 
 func capitalize(s string) string {
@@ -29,4 +28,12 @@ func lower(s string) string {
 		return strings.ToLower(s)
 	}
 	return strings.ToLower(s[:1]) + s[1:]
+}
+
+func loadTemplate(name, text string) *template.Template {
+	t, err := template.New(name).Funcs(templateFunctions).Parse(text)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }
