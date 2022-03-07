@@ -80,21 +80,31 @@ func processDir(dir string) error {
 	for _, pkg := range packages {
 		debugLogger.Printf("Start parsing package %s", pkg.Name)
 		for fileName, file := range pkg.Files {
-			err := processFile(fset, pkg, fileName, file)
+			writer, fileImports, err := processFile(fset, pkg.Name, fileName, file)
 			if err != nil {
 				return err
 			}
+			if writer == nil || fileImports == nil {
+				debugLogger.Printf("Ignoring file %s", fileName)
+				continue
+			}
+			err = writer.Write(fileImports)
+			if err != nil {
+				errorLogger.Printf("Failed to write %s", getGeneratedFileName(fileName[:len(fileName)-3]))
+				return err
+			}
+			infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
+			return nil
 		}
 	}
 	return nil
 }
 
-func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *ast.File) error {
+func processFile(fset *token.FileSet, pkgName string, fileName string, file *ast.File) (*fileWriter, map[string]*impData, error) {
 	fileComments := getCommentLines(file.Doc)
 	_, found := hasComment(fileComments, "ignore")
 	if found {
-		debugLogger.Printf("Ignoring file %s", fileName)
-		return nil
+		return nil, nil, nil
 	}
 	debugLogger.Printf("Start parsing file %s", fileName)
 	fileImports := map[string]*impData{}
@@ -116,9 +126,23 @@ func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *a
 			}
 		}
 	}
-	writer := NewFileWriter(pkg.Name, fileName[:len(fileName)-3])
-	var processErr error = nil
+	writer := NewFileWriter(pkgName, fileName[:len(fileName)-3])
 	imports := map[string]bool{}
+	for _, decl := range file.Decls {
+		if decl == nil {
+			continue
+		}
+		g, ok := decl.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+		_, err := processNode(g, imports, writer)
+		if err != nil {
+			return writer, fileImports, err
+		}
+	}
+/*
+	var processErr error = nil
 	ast.Inspect(file, func(n ast.Node) bool {
 		if processErr != nil {
 			return false
@@ -126,86 +150,87 @@ func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *a
 		if n == nil {
 			return true
 		}
-		g, ok := n.(*ast.GenDecl)
-		if !ok {
-			return true
+		result, err := processNode(n, imports, writer)
+		if processErr != nil {
+			processErr = err
 		}
-		for _, spec := range g.Specs {
-			t, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				return false
-			}
-			s, ok := t.Type.(*ast.StructType)
-			if !ok {
-				return false
-			}
-			genericTypes := map[string]string{}
-			genericTypeNames := []string{}
-			if t.TypeParams != nil {
-				for _, typeParam := range t.TypeParams.List {
-					fieldName := typeParam.Names[0].String()
-					genericType, importNames := readRootExpression(typeParam.Type, imports)
-					for imp := range importNames {
-						imports[imp] = true
-					}
-					genericTypes[fieldName] = genericType
-					genericTypeNames = append(genericTypeNames, fieldName)
-				}
-			}
-			structName := t.Name.Name
-			fields := map[string]string{}
-			fieldComments := map[string][]string{}
-			fieldNames := []string{}
-			for _, field := range s.Fields.List {
-				fieldName := field.Names[0].String()
-				typeName, importNames := readRootExpression(field.Type, imports)
-				for imp := range importNames {
-					imports[imp] = true
-				}
-				fields[fieldName] = typeName
-				fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
-				fieldNames = append(fieldNames, fieldName)
-			}
-			comments := getCommentLines(g.Doc)
-			data := &typeProcessorData{
-				packageName:      writer.pkg,
-				structName:       structName,
-				fields:           fields,
-				fieldComments:    fieldComments,
-				fieldNames:       fieldNames,
-				typeComments:     comments,
-				genericTypes:     genericTypes,
-				genericTypeNames: genericTypeNames,
-				addImport: func(i string) {
-					writer.imports[i] = true
-				},
-				addCodeWriter: func(cw codeWriter) {
-					writer.codeWriters = append(writer.codeWriters, cw)
-				},
-			}
-			for _, typeProcessor := range typeProcessors {
-				err := typeProcessor(data)
-				if err != nil {
-					processErr = err
-					return false
-				}
-			}
-		}
-		return true
+		return result
 	})
 	if processErr != nil {
-		return processErr
-	}
+		return writer, fileImports, processErr
+	}*/
 	for name, imp := range imports {
 		writer.imports[name] = imp
 	}
-	err := writer.Write(fileImports)
-	if err != nil {
-		errorLogger.Printf("Failed to write %s", getGeneratedFileName(fileName[:len(fileName)-3]))
-		return err
+	return writer, fileImports, nil
+}
+
+func processNode(n ast.Node, imports map[string]bool, writer *fileWriter) (bool, error) {
+	g, ok := n.(*ast.GenDecl)
+	if !ok {
+		return true, nil
 	}
-	infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
-	return nil
+	for _, spec := range g.Specs {
+		t, ok := spec.(*ast.TypeSpec)
+		if !ok {
+			return false, nil
+		}
+		s, ok := t.Type.(*ast.StructType)
+		if !ok {
+			return false, nil
+		}
+		genericTypes := map[string]string{}
+		genericTypeNames := []string{}
+		if t.TypeParams != nil {
+			for _, typeParam := range t.TypeParams.List {
+				fieldName := typeParam.Names[0].String()
+				genericType, importNames := readRootExpression(typeParam.Type, imports)
+				for imp := range importNames {
+					imports[imp] = true
+				}
+				genericTypes[fieldName] = genericType
+				genericTypeNames = append(genericTypeNames, fieldName)
+			}
+		}
+		structName := t.Name.Name
+		fields := map[string]string{}
+		fieldComments := map[string][]string{}
+		fieldNames := []string{}
+		for _, field := range s.Fields.List {
+			fieldName := field.Names[0].String()
+			typeName, importNames := readRootExpression(field.Type, imports)
+			for imp := range importNames {
+				imports[imp] = true
+			}
+			fields[fieldName] = typeName
+			fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
+			fieldNames = append(fieldNames, fieldName)
+		}
+		comments := getCommentLines(g.Doc)
+		data := &typeProcessorData{
+			packageName:      writer.pkg,
+			structName:       structName,
+			fields:           fields,
+			fieldComments:    fieldComments,
+			fieldNames:       fieldNames,
+			typeComments:     comments,
+			genericTypes:     genericTypes,
+			genericTypeNames: genericTypeNames,
+			addImport: func(i string) {
+				writer.imports[i] = true
+			},
+			addCodeWriter: func(cw codeWriter) {
+				writer.codeWriters = append(writer.codeWriters, cw)
+			},
+		}
+		for _, typeProcessor := range typeProcessors {
+			err := typeProcessor(data)
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+	return true, nil
 }
 
 func getCommentLines(comments *ast.CommentGroup) []string {
