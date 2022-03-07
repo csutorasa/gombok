@@ -24,9 +24,6 @@ jobs:
         
       - name: Build
         run: go1.18beta2 test
-        env:
-          GOOS: windows
-          GOARCH: amd64
 
   build_linux:
     name: Build linux
@@ -49,15 +46,6 @@ jobs:
 
       - name: Build
         run: go test
-        env:
-          GOOS: linux
-          GOARCH: amd64
-        
-      - name: Build
-        run: go test
-        env:
-          GOOS: linux
-          GOARCH: arm64
         
   build_darwin:
     name: Build Mac
@@ -79,12 +67,3 @@ jobs:
 
       - name: Build
         run: go test
-        env:
-          GOOS: darwin
-          GOARCH: amd64
-        
-      - name: Build
-        run: go test
-        env:
-          GOOS: darwin
-          GOARCH: arm64
