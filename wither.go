@@ -22,7 +22,8 @@ func processWither(data *typeProcessorData) error {
 		if err != nil {
 			return err
 		}
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			debugLogger.Printf("Generating Wither for %s.%s", data.structName, fieldName)
 			fieldCommands, found := hasComment(data.fieldComments[fieldName], "Wither")
 			if found {
@@ -36,7 +37,8 @@ func processWither(data *typeProcessorData) error {
 			}
 		}
 	} else {
-		for fieldName, typeName := range data.fields {
+		for _, fieldName := range data.fieldNames {
+			typeName := data.fields[fieldName]
 			commands, found := hasComment(data.fieldComments[fieldName], "Wither")
 			if found {
 				config, err := parseWitherConfig(commands, fmt.Sprintf("%s.%s", data.structName, fieldName))

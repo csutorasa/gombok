@@ -23,7 +23,7 @@ func processDestructor(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Destructor")
 			if found {
 				fieldConfig, err := parseDestructorFieldConfig(commands, data.structName, fieldName)

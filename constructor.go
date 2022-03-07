@@ -23,7 +23,7 @@ func processConstructor(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Constructor")
 			if found {
 				fieldConfig, err := parseConstructorFieldConfig(commands, data.structName, fieldName)
