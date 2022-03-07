@@ -136,48 +136,27 @@ func processFile(fset *token.FileSet, pkgName string, fileName string, file *ast
 		if !ok {
 			continue
 		}
-		_, err := processNode(g, imports, writer)
+		err := processNode(g, imports, writer)
 		if err != nil {
 			return writer, fileImports, err
 		}
 	}
-/*
-	var processErr error = nil
-	ast.Inspect(file, func(n ast.Node) bool {
-		if processErr != nil {
-			return false
-		}
-		if n == nil {
-			return true
-		}
-		result, err := processNode(n, imports, writer)
-		if processErr != nil {
-			processErr = err
-		}
-		return result
-	})
-	if processErr != nil {
-		return writer, fileImports, processErr
-	}*/
+
 	for name, imp := range imports {
 		writer.imports[name] = imp
 	}
 	return writer, fileImports, nil
 }
 
-func processNode(n ast.Node, imports map[string]bool, writer *fileWriter) (bool, error) {
-	g, ok := n.(*ast.GenDecl)
-	if !ok {
-		return true, nil
-	}
-	for _, spec := range g.Specs {
+func processNode(n *ast.GenDecl, imports map[string]bool, writer *fileWriter) error {
+	for _, spec := range n.Specs {
 		t, ok := spec.(*ast.TypeSpec)
 		if !ok {
-			return false, nil
+			return nil
 		}
 		s, ok := t.Type.(*ast.StructType)
 		if !ok {
-			return false, nil
+			return nil
 		}
 		genericTypes := map[string]string{}
 		genericTypeNames := []string{}
@@ -206,7 +185,7 @@ func processNode(n ast.Node, imports map[string]bool, writer *fileWriter) (bool,
 			fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
 			fieldNames = append(fieldNames, fieldName)
 		}
-		comments := getCommentLines(g.Doc)
+		comments := getCommentLines(n.Doc)
 		data := &typeProcessorData{
 			packageName:      writer.pkg,
 			structName:       structName,
@@ -226,11 +205,11 @@ func processNode(n ast.Node, imports map[string]bool, writer *fileWriter) (bool,
 		for _, typeProcessor := range typeProcessors {
 			err := typeProcessor(data)
 			if err != nil {
-				return false, err
+				return err
 			}
 		}
 	}
-	return true, nil
+	return nil
 }
 
 func getCommentLines(comments *ast.CommentGroup) []string {
