@@ -80,21 +80,31 @@ func processDir(dir string) error {
 	for _, pkg := range packages {
 		debugLogger.Printf("Start parsing package %s", pkg.Name)
 		for fileName, file := range pkg.Files {
-			err := processFile(fset, pkg, fileName, file)
+			writer, fileImports, err := processFile(fset, pkg.Name, fileName, file)
 			if err != nil {
 				return err
 			}
+			if writer == nil || fileImports == nil {
+				debugLogger.Printf("Ignoring file %s", fileName)
+				continue
+			}
+			err = writer.Write(fileImports)
+			if err != nil {
+				errorLogger.Printf("Failed to write %s", getGeneratedFileName(fileName[:len(fileName)-3]))
+				return err
+			}
+			infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
+			return nil
 		}
 	}
 	return nil
 }
 
-func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *ast.File) error {
+func processFile(fset *token.FileSet, pkgName string, fileName string, file *ast.File) (*fileWriter, map[string]*impData, error) {
 	fileComments := getCommentLines(file.Doc)
 	_, found := hasComment(fileComments, "ignore")
 	if found {
-		debugLogger.Printf("Ignoring file %s", fileName)
-		return nil
+		return nil, nil, nil
 	}
 	debugLogger.Printf("Start parsing file %s", fileName)
 	fileImports := map[string]*impData{}
@@ -116,84 +126,74 @@ func processFile(fset *token.FileSet, pkg *ast.Package, fileName string, file *a
 			}
 		}
 	}
-	writer := NewFileWriter(pkg.Name, fileName[:len(fileName)-3])
-	var processErr error = nil
+	writer := NewFileWriter(pkgName, fileName[:len(fileName)-3])
 	imports := map[string]bool{}
-	ast.Inspect(file, func(n ast.Node) bool {
-		if processErr != nil {
-			return false
+	for _, decl := range file.Decls {
+		if decl == nil {
+			continue
 		}
-		if n == nil {
-			return true
-		}
-		g, ok := n.(*ast.GenDecl)
+		g, ok := decl.(*ast.GenDecl)
 		if !ok {
-			return true
+			continue
 		}
-		for _, spec := range g.Specs {
-			t, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				return false
-			}
-			s, ok := t.Type.(*ast.StructType)
-			if !ok {
-				return false
-			}
-			genericTypes := map[string]string{}
-			genericTypeNames := []string{}
-			structName := t.Name.Name
-			fields := map[string]string{}
-			fieldComments := map[string][]string{}
-			fieldNames := []string{}
-			for _, field := range s.Fields.List {
-				fieldName := field.Names[0].String()
-				typeName, importNames := readRootExpression(field.Type, imports)
-				for imp := range importNames {
-					imports[imp] = true
-				}
-				fields[fieldName] = typeName
-				fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
-				fieldNames = append(fieldNames, fieldName)
-			}
-			comments := getCommentLines(g.Doc)
-			data := &typeProcessorData{
-				packageName:      writer.pkg,
-				structName:       structName,
-				fields:           fields,
-				fieldComments:    fieldComments,
-				fieldNames:       fieldNames,
-				typeComments:     comments,
-				genericTypes:     genericTypes,
-				genericTypeNames: genericTypeNames,
-				addImport: func(i string) {
-					writer.imports[i] = true
-				},
-				addCodeWriter: func(cw codeWriter) {
-					writer.codeWriters = append(writer.codeWriters, cw)
-				},
-			}
-			for _, typeProcessor := range typeProcessors {
-				err := typeProcessor(data)
-				if err != nil {
-					processErr = err
-					return false
-				}
-			}
+		err := processNode(g, imports, writer)
+		if err != nil {
+			return writer, fileImports, err
 		}
-		return true
-	})
-	if processErr != nil {
-		return processErr
 	}
+
 	for name, imp := range imports {
 		writer.imports[name] = imp
 	}
-	err := writer.Write(fileImports)
-	if err != nil {
-		errorLogger.Printf("Failed to write %s", getGeneratedFileName(fileName[:len(fileName)-3]))
-		return err
+	return writer, fileImports, nil
+}
+
+func processNode(n *ast.GenDecl, imports map[string]bool, writer *fileWriter) error {
+	for _, spec := range n.Specs {
+		t, ok := spec.(*ast.TypeSpec)
+		if !ok {
+			return nil
+		}
+		s, ok := t.Type.(*ast.StructType)
+		if !ok {
+			return nil
+		}
+		structName := t.Name.Name
+		fields := map[string]string{}
+		fieldComments := map[string][]string{}
+		fieldNames := []string{}
+		for _, field := range s.Fields.List {
+			fieldName := field.Names[0].String()
+			typeName, importNames := readRootExpression(field.Type, imports)
+			for imp := range importNames {
+				imports[imp] = true
+			}
+			fields[fieldName] = typeName
+			fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
+			fieldNames = append(fieldNames, fieldName)
+		}
+		comments := getCommentLines(n.Doc)
+		data := &typeProcessorData{
+			packageName:      writer.pkg,
+			structName:       structName,
+			fields:           fields,
+			fieldComments:    fieldComments,
+			fieldNames:       fieldNames,
+			typeComments:     comments,
+			addImport: func(i string) {
+				writer.imports[i] = true
+			},
+			addCodeWriter: func(cw codeWriter) {
+				writer.codeWriters = append(writer.codeWriters, cw)
+			},
+		}
+		for _, typeProcessor := range typeProcessors {
+			err := typeProcessor(data)
+			if err != nil {
+				return err
+			}
+		}
 	}
-	infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
 	return nil
 }
 
@@ -295,6 +295,13 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 		k, _ := readChildExpression(e.Key, e, imports)
 		v, _ := readChildExpression(e.Value, e, imports)
 		return fmt.Sprintf("%smap[%s]%s", name, k, v), imports
+	case *ast.UnaryExpr:
+		x, _ := readChildExpression(e.X, e, imports)
+		return fmt.Sprintf("%s%s%s", name, e.Op.String(), x), imports
+	case *ast.BinaryExpr:
+		x, _ := readChildExpression(e.X, e, imports)
+		y, _ := readChildExpression(e.Y, e, imports)
+		return fmt.Sprintf("%s%s %s %s", name, x, e.Op.String(), y), imports
 	case *ast.ChanType:
 		var ch string
 		if e.Dir == ast.SEND {
@@ -347,15 +354,6 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 				results = append(results, v)
 			}
 		}
-		genericText := ""
-		if len(results) == 0 {
-			switch parent.(type) {
-			case *ast.InterfaceType:
-				return fmt.Sprintf("%s%s(%s)", name, genericText, strings.Join(params, ", ")), imports
-			default:
-				return fmt.Sprintf("%sfunc%s(%s)", name, genericText, strings.Join(params, ", ")), imports
-			}
-		}
 		joinedResults := strings.Join(results, ", ")
 		switch parent.(type) {
 		case *ast.InterfaceType:
@@ -366,9 +364,9 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 			}
 		default:
 			if strings.Index(joinedResults, " ") == -1 {
-				return fmt.Sprintf("%sfunc%s(%s) %s", name, genericText, strings.Join(params, ", "), joinedResults), imports
+				return fmt.Sprintf("%sfunc(%s) %s", name, strings.Join(params, ", "), joinedResults), imports
 			} else {
-				return fmt.Sprintf("%sfunc%s(%s) (%s)", name, genericText, strings.Join(params, ", "), joinedResults), imports
+				return fmt.Sprintf("%sfunc(%s) (%s)", name, strings.Join(params, ", "), joinedResults), imports
 			}
 		}
 	default:

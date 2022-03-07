@@ -23,7 +23,7 @@ func processStringer(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Stringer")
 			if found {
 				fieldConfig, err := parseStringerFieldConfig(commands, data.structName, fieldName)
@@ -44,8 +44,6 @@ func processStringer(data *typeProcessorData) error {
 				"packageName":      data.packageName,
 				"structName":       data.structName,
 				"fieldNames":       fieldNames,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
 			})
 		})
 	}

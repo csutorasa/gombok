@@ -23,7 +23,7 @@ func processDestructor(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Destructor")
 			if found {
 				fieldConfig, err := parseDestructorFieldConfig(commands, data.structName, fieldName)
@@ -44,12 +44,10 @@ func processDestructor(data *typeProcessorData) error {
 		debugLogger.Printf("Generating Destructor for %s", data.structName)
 		data.addCodeWriter(func(wr io.Writer) error {
 			return destructorTemplate.Execute(wr, map[string]interface{}{
-				"structName":       data.structName,
-				"fieldNames":       fieldNames,
-				"fields":           data.fields,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
-				"d":                d,
+				"structName": data.structName,
+				"fieldNames": fieldNames,
+				"fields":     data.fields,
+				"d":          d,
 			})
 		})
 	}

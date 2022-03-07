@@ -23,7 +23,7 @@ func processBuilder(data *typeProcessorData) error {
 			return err
 		}
 		fieldNames := []string{}
-		for fieldName := range data.fields {
+		for _, fieldName := range data.fieldNames {
 			commands, found := hasComment(data.fieldComments[fieldName], "Builder")
 			if found {
 				fieldConfig, err := parseBuilderFieldConfig(commands, data.structName, fieldName)
@@ -40,11 +40,9 @@ func processBuilder(data *typeProcessorData) error {
 		debugLogger.Printf("Generating Builder for %s", data.structName)
 		data.addCodeWriter(func(wr io.Writer) error {
 			return builderTemplate.Execute(wr, map[string]interface{}{
-				"structName":       data.structName,
-				"fieldNames":       fieldNames,
-				"fields":           data.fields,
-				"genericTypes":     data.genericTypes,
-				"genericTypeNames": data.genericTypeNames,
+				"structName": data.structName,
+				"fieldNames": fieldNames,
+				"fields":     data.fields,
 			})
 		})
 	}

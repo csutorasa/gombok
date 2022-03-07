@@ -1,5 +1,5 @@
 
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
+func (this *{{ .structName }}) {{ .s }}et{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }} {
 	this.{{ .fieldName }} = {{ .fieldName }}
 	return this
 }

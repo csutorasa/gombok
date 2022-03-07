@@ -1,19 +1,19 @@
-{{ $fields := .fields }}{{ $structName := .structName }}{{ $genericTypeNames := .genericTypeNames }}
-type {{ lower .structName }}Builder{{ genericListWithTypes .genericTypeNames .genericTypes }} struct {
-	data {{ .structName }}{{ genericList .genericTypeNames }}
+{{ $fields := .fields }}{{ $structName := .structName }}
+type {{ lower .structName }}Builder struct {
+	data {{ .structName }}
 }
 {{ range .fieldNames }}
-func (this *{{ lower $structName }}Builder{{ genericList $genericTypeNames }}) {{ capitalize . }}({{ . }} {{ index $fields . }}) *{{ lower $structName }}Builder{{ genericList $genericTypeNames }} {
+func (this *{{ lower $structName }}Builder) {{ capitalize . }}({{ . }} {{ index $fields . }}) *{{ lower $structName }}Builder {
 	this.data.{{ . }} = {{ . }}
 	return this
 }
 {{end}}
-func (this *{{ lower $structName }}Builder{{ genericList .genericTypeNames }}) Build() {{ .structName }}{{ genericList .genericTypeNames }} {
+func (this *{{ lower $structName }}Builder) Build() {{ .structName }} {
 	return this.data
 }
 
-func New{{ capitalize .structName }}Builder{{ genericListWithTypes .genericTypeNames .genericTypes }}() *{{ lower .structName }}Builder{{ genericList .genericTypeNames }} {
-	return &{{ lower .structName }}Builder{{ genericList .genericTypeNames }}{
-		data: {{ .structName }}{{ genericList .genericTypeNames }}{},
+func New{{ capitalize .structName }}Builder() *{{ lower .structName }}Builder {
+	return &{{ lower .structName }}Builder{
+		data: {{ .structName }}{},
 	}
 }

@@ -1,6 +1,6 @@
 {{ $fields := .fields }}{{ $fieldName := .fieldName }}
-func (this *{{ .structName }}{{ genericList .genericTypeNames }}) {{ .w }}ith{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }}{{ genericList .genericTypeNames }} {
-	return &{{ .structName }}{{ genericList .genericTypeNames }}{
+func (this *{{ .structName }}) {{ .w }}ith{{ capitalize .fieldName }}({{ .fieldName }} {{ .fieldType }}) *{{ .structName }} {
+	return &{{ .structName }}{
 {{ range .fieldNames }}		{{ . }}: {{ if eq . $fieldName }}{{ . }}{{ else }}this.{{ . }}{{ end }},
 {{ end }}	}
 }

@@ -9,16 +9,14 @@ import (
 const ignore string = "//gombok:ignore"
 
 type typeProcessorData struct {
-	packageName      string
-	structName       string
-	fields           map[string]string
-	fieldComments    map[string][]string
-	fieldNames       []string
-	typeComments     []string
-	genericTypes     map[string]string
-	genericTypeNames []string
-	addImport        func(string)
-	addCodeWriter    func(codeWriter)
+	packageName   string
+	structName    string
+	fields        map[string]string
+	fieldComments map[string][]string
+	fieldNames    []string
+	typeComments  []string
+	addImport     func(string)
+	addCodeWriter func(codeWriter)
 }
 
 type typeProcessor func(data *typeProcessorData) error
@@ -70,16 +68,20 @@ func (this *fileWriter) Write(fileImports map[string]*impData) error {
 	if err != nil {
 		return err
 	}
-	err = writeHeader(f, this.pkg)
+	return this.WriteTo(f, fileImports)
+}
+
+func (this *fileWriter) WriteTo(wr io.Writer, fileImports map[string]*impData) error {
+	err := writeHeader(wr, this.pkg)
 	if err != nil {
 		return err
 	}
-	err = writeImport(f, this.imports, fileImports)
+	err = writeImport(wr, this.imports, fileImports)
 	if err != nil {
 		return err
 	}
 	for _, cw := range this.codeWriters {
-		err = cw(f)
+		err = cw(wr)
 		if err != nil {
 			return err
 		}
