@@ -12,7 +12,7 @@ You can upgrade to 1.18 or newer and use generics [here](https://github.com/csut
 Install the generator with the following command:
 
 ```bash
-go install github.com/csutorasa/gombok@v0.13.1
+go install github.com/csutorasa/gombok@v0.13.2
 ```
 
 ## How to use
