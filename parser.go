@@ -166,8 +166,13 @@ func processNode(n *ast.GenDecl, imports map[string]bool, writer *fileWriter) er
 		fieldComments := map[string][]string{}
 		fieldNames := []string{}
 		for _, field := range s.Fields.List {
-			fieldName := field.Names[0].String()
 			typeName, importNames := readRootExpression(field.Type, imports)
+			var fieldName string
+			if len(field.Names) == 0 {
+				fieldName = typeName
+			} else {
+				fieldName = field.Names[0].String()
+			}
 			for imp := range importNames {
 				imports[imp] = true
 			}
