@@ -12,7 +12,7 @@ You can downgrade to 1.13 for older project [here](https://github.com/csutorasa/
 Install the generator with the following command:
 
 ```bash
-go install github.com/csutorasa/gombok@v0.16.2
+go install github.com/csutorasa/gombok@v0.16.3
 ```
 
 ## How to use

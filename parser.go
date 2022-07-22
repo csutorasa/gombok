@@ -164,18 +164,23 @@ func processNode(n *ast.GenDecl, imports map[string]bool, writer *fileWriter) er
 		fieldNames := []string{}
 		for _, field := range s.Fields.List {
 			typeName, importNames := readRootExpression(field.Type, imports)
-			var fieldName string
-			if len(field.Names) == 0 {
-				fieldName = typeName
-			} else {
-				fieldName = field.Names[0].String()
-			}
 			for imp := range importNames {
 				imports[imp] = true
 			}
-			fields[fieldName] = typeName
-			fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
-			fieldNames = append(fieldNames, fieldName)
+			if len(field.Names) == 0 {
+				fieldName := typeName
+
+				fields[fieldName] = typeName
+				fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
+				fieldNames = append(fieldNames, fieldName)
+			} else {
+				for _, fieldNameIdent := range field.Names {
+					fieldName := fieldNameIdent.String()
+					fields[fieldName] = typeName
+					fieldComments[fieldName] = append(getCommentLines(field.Doc), readTags(field, writer.pkg, structName, fieldName)...)
+					fieldNames = append(fieldNames, fieldName)
+				}
+			}
 		}
 		comments := getCommentLines(n.Doc)
 		data := &typeProcessorData{
