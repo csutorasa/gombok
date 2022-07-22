@@ -12,7 +12,7 @@ You can downgrade to 1.13 but cannot use generics [here](https://github.com/csut
 Install the generator with the following command:
 
 ```bash
-go install github.com/csutorasa/gombok@v0.18.1
+go install github.com/csutorasa/gombok@v0.18.2
 ```
 
 ## How to use
