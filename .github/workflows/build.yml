@@ -1,8 +1,11 @@
 name: Build
 on:
+  pull_request:
+    branches:
+      - "1.13"
   push:
     branches:
-      - 1.13
+      - "1.13"
 
 jobs:
   build_windows:
