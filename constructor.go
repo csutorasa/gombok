@@ -58,7 +58,7 @@ type constructorConfig struct {
 
 func parseConstructorConfig(commands []string, structName string) (*constructorConfig, error) {
 	for _, command := range commands {
-		return nil, fmt.Errorf("Invalid command %s on %s Constructor", command, structName)
+		return nil, fmt.Errorf("invalid command %s on %s Constructor", command, structName)
 	}
 	return &constructorConfig{}, nil
 }
@@ -74,18 +74,18 @@ func parseConstructorFieldConfig(commands []string, structName, fieldName string
 		switch command {
 		case "exclude":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Constructor", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Constructor", command, structName, fieldName)
 			}
 			exclude = true
 			excludeSet = true
 		case "include":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Constructor", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Constructor", command, structName, fieldName)
 			}
 			exclude = false
 			excludeSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s.%s Constructor", command, structName, fieldName)
+			return nil, fmt.Errorf("invalid command %s on %s.%s Constructor", command, structName, fieldName)
 		}
 	}
 	return &constructorFieldConfig{

@@ -97,7 +97,6 @@ func processDir(dir string) error {
 				return err
 			}
 			infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
-			return nil
 		}
 	}
 	return nil
@@ -187,12 +186,12 @@ func processNode(n *ast.GenDecl, imports map[string]bool, writer *fileWriter) er
 		}
 		comments := getCommentLines(n.Doc)
 		data := &typeProcessorData{
-			packageName:      writer.pkg,
-			structName:       structName,
-			fields:           fields,
-			fieldComments:    fieldComments,
-			fieldNames:       fieldNames,
-			typeComments:     comments,
+			packageName:   writer.pkg,
+			structName:    structName,
+			fields:        fields,
+			fieldComments: fieldComments,
+			fieldNames:    fieldNames,
+			typeComments:  comments,
 			addImport: func(i string) {
 				writer.imports[i] = true
 			},
@@ -215,7 +214,7 @@ func getCommentLines(comments *ast.CommentGroup) []string {
 	if comments == nil || comments.List == nil {
 		return c
 	}
-	prefix := "//gombok:"
+	prefix := "//go:gombok "
 	for _, comment := range comments.List {
 		if strings.Index(comment.Text, prefix) == 0 {
 			c = append(c, comment.Text[len(prefix):])

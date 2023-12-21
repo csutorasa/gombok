@@ -66,18 +66,18 @@ func parseGetterConfig(commands []string, structName string) (*getterConfig, err
 		switch command {
 		case "private":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Getter", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Getter", command, structName)
 			}
 			private = true
 			privateSet = true
 		case "exported":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Getter", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Getter", command, structName)
 			}
 			private = false
 			privateSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s Getter", command, structName)
+			return nil, fmt.Errorf("invalid command %s on %s Getter", command, structName)
 		}
 	}
 	return &getterConfig{

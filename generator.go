@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const ignore string = "//gombok:ignore"
+const ignore string = "//go:gombok ignore"
 
 type typeProcessorData struct {
 	packageName   string
@@ -45,10 +45,10 @@ func NewFileWriter(pkg, file string) *fileWriter {
 	}
 }
 
-func (this *fileWriter) getImports() []string {
-	imports := make([]string, len(this.imports))
+func (w *fileWriter) getImports() []string {
+	imports := make([]string, len(w.imports))
 	i := 0
-	for imp := range this.imports {
+	for imp := range w.imports {
 		imports[i] = imp
 		i = i + 1
 	}
@@ -59,28 +59,28 @@ func getGeneratedFileName(path string) string {
 	return fmt.Sprintf(filenameFormatter, path)
 }
 
-func (this *fileWriter) Write(fileImports map[string]*impData) error {
-	if len(this.imports) == 0 && len(this.codeWriters) == 0 {
+func (w *fileWriter) Write(fileImports map[string]*impData) error {
+	if len(w.imports) == 0 && len(w.codeWriters) == 0 {
 		return nil
 	}
-	filePath := getGeneratedFileName(this.file)
+	filePath := getGeneratedFileName(w.file)
 	f, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}
-	return this.WriteTo(f, fileImports)
+	return w.WriteTo(f, fileImports)
 }
 
-func (this *fileWriter) WriteTo(wr io.Writer, fileImports map[string]*impData) error {
-	err := writeHeader(wr, this.pkg)
+func (w *fileWriter) WriteTo(wr io.Writer, fileImports map[string]*impData) error {
+	err := writeHeader(wr, w.pkg)
 	if err != nil {
 		return err
 	}
-	err = writeImport(wr, this.imports, fileImports)
+	err = writeImport(wr, w.imports, fileImports)
 	if err != nil {
 		return err
 	}
-	for _, cw := range this.codeWriters {
+	for _, cw := range w.codeWriters {
 		err = cw(wr)
 		if err != nil {
 			return err

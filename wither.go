@@ -68,18 +68,18 @@ func parseWitherConfig(commands []string, structName string) (*witherConfig, err
 		switch command {
 		case "private":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Wither", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Wither", command, structName)
 			}
 			private = true
 			privateSet = true
 		case "exported":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Wither", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Wither", command, structName)
 			}
 			private = false
 			privateSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s Wither", command, structName)
+			return nil, fmt.Errorf("invalid command %s on %s Wither", command, structName)
 		}
 	}
 	return &witherConfig{
@@ -94,12 +94,12 @@ func addWither(fieldName, fieldType string, data *typeProcessorData, config *wit
 	}
 	data.addCodeWriter(func(wr io.Writer) error {
 		return witherTemplate.Execute(wr, map[string]interface{}{
-			"structName":       data.structName,
-			"fieldName":        fieldName,
-			"fieldType":        fieldType,
-			"fieldNames":       data.fieldNames,
-			"fields":           data.fields,
-			"w":                w,
+			"structName": data.structName,
+			"fieldName":  fieldName,
+			"fieldType":  fieldType,
+			"fieldNames": data.fieldNames,
+			"fields":     data.fields,
+			"w":          w,
 		})
 	})
 }

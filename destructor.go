@@ -67,18 +67,18 @@ func parseDestructorConfig(commands []string, structName string) (*destructorCon
 		switch command {
 		case "private":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Destructor", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Destructor", command, structName)
 			}
 			private = true
 			privateSet = true
 		case "exported":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Destructor", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Destructor", command, structName)
 			}
 			private = false
 			privateSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s Destructor", command, structName)
+			return nil, fmt.Errorf("invalid command %s on %s Destructor", command, structName)
 		}
 	}
 	return &destructorConfig{
@@ -97,18 +97,18 @@ func parseDestructorFieldConfig(commands []string, structName, fieldName string)
 		switch command {
 		case "exclude":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Destructor", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Destructor", command, structName, fieldName)
 			}
 			exclude = true
 			excludeSet = true
 		case "include":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Destructor", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Destructor", command, structName, fieldName)
 			}
 			exclude = false
 			excludeSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s.%s Destructor", command, structName, fieldName)
+			return nil, fmt.Errorf("invalid command %s on %s.%s Destructor", command, structName, fieldName)
 		}
 	}
 	return &destructorFieldConfig{

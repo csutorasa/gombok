@@ -5,7 +5,7 @@ Getter creates getter function for a given field.
 ## Example
 
 ```go
-//gombok:Getter
+//go:gombok Getter
 type Name struct {
     firstname string
     lastname string
