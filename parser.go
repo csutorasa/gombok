@@ -94,7 +94,6 @@ func processDir(dir string) error {
 				return err
 			}
 			infoLogger.Printf("%s is created", getGeneratedFileName(fileName[:len(fileName)-3]))
-			return nil
 		}
 	}
 	return nil
