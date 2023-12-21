@@ -5,7 +5,7 @@ Stringer implements the `fmt.Stringer` interface.
 ## Example
 
 ```go
-//gombok:Stringer
+//go:gombok Stringer
 type Name struct {
     firstname string
     lastname string

@@ -5,7 +5,7 @@ Constructor creates a constructor function for the given type.
 ## Example
 
 ```go
-//gombok:Constructor
+//go:gombok Constructor
 type Name struct {
     firstname string
     lastname string

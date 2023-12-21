@@ -56,7 +56,7 @@ type builderConfig struct {
 
 func parseBuilderConfig(commands []string, structName string) (*builderConfig, error) {
 	for _, command := range commands {
-		return nil, fmt.Errorf("Invalid command %s on %s Builder", command, structName)
+		return nil, fmt.Errorf("invalid command %s on %s Builder", command, structName)
 	}
 	return &builderConfig{}, nil
 }
@@ -72,18 +72,18 @@ func parseBuilderFieldConfig(commands []string, structName, fieldName string) (*
 		switch command {
 		case "exclude":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Builder", command, structName, fieldName)
+				return nil, fmt.Errorf("nvalid command %s on %s.%s Builder", command, structName, fieldName)
 			}
 			exclude = true
 			excludeSet = true
 		case "include":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Builder", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Builder", command, structName, fieldName)
 			}
 			exclude = false
 			excludeSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s.%s Builder", command, structName, fieldName)
+			return nil, fmt.Errorf("invalid command %s on %s.%s Builder", command, structName, fieldName)
 		}
 	}
 	return &builderFieldConfig{

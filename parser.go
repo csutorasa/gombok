@@ -226,7 +226,7 @@ func getCommentLines(comments *ast.CommentGroup) []string {
 	if comments == nil || comments.List == nil {
 		return c
 	}
-	prefix := "//gombok:"
+	prefix := "//go:gombok "
 	for _, comment := range comments.List {
 		if strings.Index(comment.Text, prefix) == 0 {
 			c = append(c, comment.Text[len(prefix):])
@@ -404,13 +404,13 @@ func readExpression(expr ast.Expr, parent ast.Expr, name string, imports map[str
 		joinedResults := strings.Join(results, ", ")
 		switch parent.(type) {
 		case *ast.InterfaceType:
-			if strings.Index(joinedResults, " ") == -1 {
+			if !strings.Contains(joinedResults, " ") {
 				return fmt.Sprintf("%s(%s) %s", name, strings.Join(params, ", "), joinedResults), imports
 			} else {
 				return fmt.Sprintf("%s(%s) (%s)", name, strings.Join(params, ", "), joinedResults), imports
 			}
 		default:
-			if strings.Index(joinedResults, " ") == -1 {
+			if !strings.Contains(joinedResults, " ") {
 				return fmt.Sprintf("%sfunc%s(%s) %s", name, genericText, strings.Join(params, ", "), joinedResults), imports
 			} else {
 				return fmt.Sprintf("%sfunc%s(%s) (%s)", name, genericText, strings.Join(params, ", "), joinedResults), imports

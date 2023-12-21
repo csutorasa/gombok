@@ -5,7 +5,7 @@ Setter creates setter function for a given field.
 ## Example
 
 ```go
-//gombok:Setter
+//go:gombok Setter
 type Name struct {
     firstname string
     lastname string

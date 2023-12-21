@@ -5,7 +5,7 @@ Wither creates a function that returns a new instance with a modified field.
 ## Example
 
 ```go
-//gombok:Wither
+//go:gombok Wither
 type Name struct {
     firstname string
     lastname string

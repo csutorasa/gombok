@@ -57,7 +57,7 @@ type stringerConfig struct {
 
 func parseStringerConfig(commands []string, structName string) (*stringerConfig, error) {
 	for _, command := range commands {
-		return nil, fmt.Errorf("Invalid command %s on %s Stringer", command, structName)
+		return nil, fmt.Errorf("invalid command %s on %s Stringer", command, structName)
 	}
 	return &stringerConfig{}, nil
 }
@@ -73,18 +73,18 @@ func parseStringerFieldConfig(commands []string, structName, fieldName string) (
 		switch command {
 		case "exclude":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Stringer", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Stringer", command, structName, fieldName)
 			}
 			exclude = true
 			excludeSet = true
 		case "include":
 			if excludeSet {
-				return nil, fmt.Errorf("Invalid command %s on %s.%s Stringer", command, structName, fieldName)
+				return nil, fmt.Errorf("invalid command %s on %s.%s Stringer", command, structName, fieldName)
 			}
 			exclude = false
 			excludeSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s.%s Stringer", command, structName, fieldName)
+			return nil, fmt.Errorf("invalid command %s on %s.%s Stringer", command, structName, fieldName)
 		}
 	}
 	return &stringerFieldConfig{

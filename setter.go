@@ -72,24 +72,24 @@ func parseSetterConfig(commands []string, structName string) (*setterConfig, err
 		switch command {
 		case "private":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Setter", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Setter", command, structName)
 			}
 			private = true
 			privateSet = true
 		case "exported":
 			if privateSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Setter", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Setter", command, structName)
 			}
 			private = false
 			privateSet = true
 		case "chained":
 			if chainSet {
-				return nil, fmt.Errorf("Invalid command %s on %s Setter", command, structName)
+				return nil, fmt.Errorf("invalid command %s on %s Setter", command, structName)
 			}
 			chain = true
 			chainSet = true
 		default:
-			return nil, fmt.Errorf("Invalid command %s on %s Setter", command, structName)
+			return nil, fmt.Errorf("invalid command %s on %s Setter", command, structName)
 		}
 	}
 	return &setterConfig{

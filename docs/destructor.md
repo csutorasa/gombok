@@ -5,7 +5,7 @@ Destructor creates a function for the given type, that returns all the fields.
 ## Example
 
 ```go
-//gombok:Destructor
+//go:gombok Destructor
 type Name struct {
     firstname string
     lastname string

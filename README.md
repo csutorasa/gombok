@@ -28,7 +28,7 @@ Enable default generation:
 This enables processing all files in the project. To disable processing for specific files you can add:
 
 ```go
-//gombok:ignore
+//go:gombok ignore
 ```
 
 All generated files have this ignore flag.
@@ -37,9 +37,9 @@ All generated files have this ignore flag.
 You can add the gombok comments or tags to enable code generation.
 
 ```go
-//gombok:Stringer
+//go:gombok Stringer
 type Example struct {
-    //gombok:Getter
+    //go:gombok Getter
     firstname string
     lastname string `gombokSetter:""`
 }
